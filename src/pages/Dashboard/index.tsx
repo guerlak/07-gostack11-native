@@ -30,12 +30,16 @@ interface Product {
 
 const Dashboard: React.FC = () => {
   const { addToCart } = useCart();
-
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO
+      try {
+        const { data } = await api.get('/products');
+        setProducts(data);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     loadProducts();
@@ -43,6 +47,7 @@ const Dashboard: React.FC = () => {
 
   function handleAddToCart(item: Product): void {
     // TODO
+    addToCart({ ...item, quantity: 1 });
   }
 
   return (
@@ -58,7 +63,7 @@ const Dashboard: React.FC = () => {
           renderItem={({ item }) => (
             <Product>
               <ProductImage source={{ uri: item.image_url }} />
-              <ProductTitle>{item.title}</ProductTitle>
+              <ProductTitle> {item.title}</ProductTitle>
               <PriceContainer>
                 <ProductPrice>{formatValue(item.price)}</ProductPrice>
                 <ProductButton

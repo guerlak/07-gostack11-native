@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import React, {
   createContext,
   useState,
@@ -24,36 +25,19 @@ interface CartContext {
 }
 
 const CartContext = createContext<CartContext | null>(null);
-
 const CartProvider: React.FC = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
       // TODO LOAD ITEMS FROM ASYNC STORAGE
-      const storage = await AsyncStorage.getItem('products');
+      const storage = await AsyncStorage.getItem('@GoBarber:products');
       if (storage) {
         setProducts(JSON.parse(storage));
       }
-      // AsyncStorage.clear();
     }
-
     loadProducts();
   }, []);
-
-  const addToCart = useCallback(
-    async product => {
-      // TODO ADD A NEW ITEM TO THE CART
-      const checkExist = products.filter(p => p.id === product.id);
-      if (!checkExist.length) {
-        setProducts([...products, product]);
-        await AsyncStorage.setItem('products', JSON.stringify(products));
-      } else {
-        increment(product.id);
-      }
-    },
-    [products],
-  );
 
   const increment = useCallback(
     async id => {
@@ -62,7 +46,10 @@ const CartProvider: React.FC = ({ children }) => {
       const prod = products[index];
       prod.quantity++;
       setProducts([...products]);
-      await AsyncStorage.setItem('products', JSON.stringify(products));
+      await AsyncStorage.setItem(
+        '@GoBarber:products',
+        JSON.stringify(products),
+      );
     },
     [products],
   );
@@ -75,11 +62,29 @@ const CartProvider: React.FC = ({ children }) => {
       if (prod.quantity > 1) {
         prod.quantity--;
         setProducts([...products]);
-        await AsyncStorage.setItem('products', JSON.stringify(products));
+        await AsyncStorage.setItem(
+          '@GoBarber:products',
+          JSON.stringify(products),
+        );
       }
     },
     [products],
   );
+
+  const addToCart = useCallback(async product => {
+    // TODO ADD A NEW ITEM TO THE CART
+    const checkExist = products.filter(p => p.id === product.id);
+    if (!checkExist.length) {
+      product.quantity = 1;
+      setProducts([...products, product]);
+      await AsyncStorage.setItem(
+        '@GoBarber:products',
+        JSON.stringify(products),
+      );
+    } else {
+      increment(product.id);
+    }
+  }, []);
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
@@ -91,12 +96,9 @@ const CartProvider: React.FC = ({ children }) => {
 
 function useCart(): CartContext {
   const context = useContext(CartContext);
-
   if (!context) {
     throw new Error(`useCart must be used within a CartProvider`);
   }
-
   return context;
 }
-
 export { CartProvider, useCart };

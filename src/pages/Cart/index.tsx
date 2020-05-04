@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import { View, Text } from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather';
-
-import { View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+// import AsyncStorage from '@react-native-community/async-storage';
+import formatValue from '../../utils/formatValue';
+import { useCart } from '../../hooks/cart';
 
 import {
   Container,
@@ -23,10 +26,6 @@ import {
   SubtotalValue,
 } from './styles';
 
-import { useCart } from '../../hooks/cart';
-
-import formatValue from '../../utils/formatValue';
-
 interface Product {
   id: string;
   title: string;
@@ -39,18 +38,15 @@ const Cart: React.FC = () => {
   const { increment, decrement, products } = useCart();
 
   function handleIncrement(id: string): void {
-    // TODO
     increment(id);
   }
 
   function handleDecrement(id: string): void {
-    // TODO
     decrement(id);
   }
 
   const cartTotal = useMemo(() => {
     // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
-
     const total = products.reduce((acc, product) => {
       return acc + product.price * product.quantity;
     }, 0);
@@ -59,12 +55,15 @@ const Cart: React.FC = () => {
 
   const totalItensInCart = useMemo(() => {
     // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
-
     const total = products.reduce((acc, product) => {
       return acc + product.quantity;
     }, 0);
     return total;
   }, [products]);
+
+  // const handleClear = useCallback(() => {
+  //   AsyncStorage.clear();
+  // }, []);
 
   return (
     <Container>
@@ -85,10 +84,8 @@ const Cart: React.FC = () => {
                   <ProductSinglePrice>
                     {formatValue(item.price)}
                   </ProductSinglePrice>
-
                   <TotalContainer>
                     <ProductQuantity>{`${item.quantity}x`}</ProductQuantity>
-
                     <ProductPrice>
                       {formatValue(item.price * item.quantity)}
                     </ProductPrice>
@@ -113,11 +110,18 @@ const Cart: React.FC = () => {
           )}
         />
       </ProductContainer>
+
       <TotalProductsContainer>
         <FeatherIcon name="shopping-cart" color="#fff" size={24} />
         <TotalProductsText>{`${totalItensInCart} itens`}</TotalProductsText>
         <SubtotalValue>{cartTotal}</SubtotalValue>
       </TotalProductsContainer>
+      {/* <TouchableOpacity
+        onPress={handleClear}
+        style={{ padding: 5, backgroundColor: '#fff' }}
+      >
+        <Text>Clear Storage</Text>
+      </TouchableOpacity> */}
     </Container>
   );
 };

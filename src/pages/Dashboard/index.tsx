@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
 
   function handleAddToCart(item: Product): void {
     // TODO
-    addToCart({ ...item, quantity: 1 });
+    addToCart(item);
   }
 
   return (
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
           renderItem={({ item }) => (
             <Product>
               <ProductImage source={{ uri: item.image_url }} />
-              <ProductTitle> {item.title}</ProductTitle>
+              <ProductTitle>{item.title}</ProductTitle>
               <PriceContainer>
                 <ProductPrice>{formatValue(item.price)}</ProductPrice>
                 <ProductButton
